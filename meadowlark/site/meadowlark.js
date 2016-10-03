@@ -14,13 +14,32 @@ app.set('port', process.env.PORT || 3000);
 // static middleware 추가 (__dirname은 실행 중인 script가 들어 있는 directory로 전연 변수이다.)
 app.use(express.static(__dirname + '/public'));
 
-// path 처리
+// qa test
+app.use((req, res, next) => {
+    // query string에 test=1이 있으면 (그리고 실무 production 서버가 아니면) res.locals.showTests == true가 됩니다.
+    res.locals.showTests = app.get('env') !== 'production' && req.query.test === '1';
+    next();
+});
+
+
+// router 정의 코드
 app.get('/', (req, res) => {
     res.render('home');
 });
 
 app.get('/about', (req, res) => {
-    res.render('about', { fortune : fortune.getFortune() });
+    res.render('about', { 
+        fortune : fortune.getFortune(),
+        pageTestScript : '/qa/tests-about.js' 
+    });
+});
+
+app.get('/tours/hood-river', (req, res) => {
+    res.render('tours/hood-river');
+});
+
+app.get('/tours/request-group-rate', (req, res) => {
+    res.render('tours/request-group-rate');
 });
 
 // What is follback?
